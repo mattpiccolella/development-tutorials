@@ -96,6 +96,29 @@ It, however, requires the installation of [SVN](svn) and [Exemaker](exe). If you
 
 -----
 
+## 1.0 The Structure of a Django Application
+Many of you have probably heard of the [Model-View-Controller](mvc) framework in Software Development. Basically what it means is that the model is meant to represent, or "model", the data, the view is meant to visually represent the content, and the controller is meant to link the user and the interface.
+
+Django uses its own adaptation of this framework, known as the "Model-View-Template" framework. We will explain what each one of these means here.
+
+### 1.1 Models
+Models in Django represent data that is stored in a database. Things like Users, Documents, Locations (think nouns). We write models to "model" the data we want to store for later. These classes, written in Python, allow us to create, retrieve, update, and delete records from our database very easily. For those of you who have taken Java, think objects in Object-Oriented Programming.
+
+### 1.2 Views
+Views are generally the point that Django begins to stray from the MVC framework. In Django, rather than being a way to visually present content, views are used to provide the data to the visual template. In Python, we see these as functions that are called before a page is loaded. For example, if you were building a social media site that had a User Profile page, a function called something like `profile()` would exist that would be called whenever our User Profile page was loaded. The function would then be responsible for providing information like the user's name or profile picture to the page. In this way, we can see our view function as providing the data that a visual representation needs.
+
+### 1.3 Templates
+Templates, then, are the visual representations that we referred to in the last section. For our User Profile page, we would need a kind of "template" that would structure our data visually. We would need a basic page that could later be supplied with the user's name or how many friends they have. The template, then, is generic and can later be filled in with whatever data we pass it. In Django, the template, then, is a simply HTML page that is modified slightly to fit with the MVT model we are used.
+
+### 1.4 URLs
+Although they do not fall under the MVT framework we have been discussing, URLs are very important to Django. They essentially link URLs, as they are typed in to a search box on a browser, to a specific view function. For example, if my site were named `www.facetagram.com` and I wanted my users to see their profile when they went to `www.facetagram.com/profile`, I could specify that whenever a user visits that particular URL, my `profile()` view function would be called.
+
+To gain a better understanding of how these parts fit together, we will now begin our sample Django application. This application will be a simple implementation of a Twitter-like application. Users will be able to see a news feed on their homepage of "tweets" that other users have shared. By building this, we will be able to become much more familiar with each one of these parts and how they are implemented in our Python framework.
+
+-----
+
+
+
 
 
 
@@ -119,3 +142,4 @@ It, however, requires the installation of [SVN](svn) and [Exemaker](exe). If you
 [install-django]: https://www.djangoproject.com/download/
 [svn]: http://sourceforge.net/projects/win32svn/
 [windows-install]: http://effbot.org/zone/django.htm
+[mvc]: http://www.codinghorror.com/blog/2008/05/understanding-model-view-controller.html
