@@ -113,9 +113,67 @@ Templates, then, are the visual representations that we referred to in the last 
 ### 1.4 URLs
 Although they do not fall under the MVT framework we have been discussing, URLs are very important to Django. They essentially link URLs, as they are typed in to a search box on a browser, to a specific view function. For example, if my site were named `www.facetagram.com` and I wanted my users to see their profile when they went to `www.facetagram.com/profile`, I could specify that whenever a user visits that particular URL, my `profile()` view function would be called.
 
+-----
+
+## 2.0 Starting our Application
+
 To gain a better understanding of how these parts fit together, we will now begin our sample Django application. This application will be a simple implementation of a Twitter-like application. Users will be able to see a news feed on their homepage of "tweets" that other users have shared. By building this, we will be able to become much more familiar with each one of these parts and how they are implemented in our Python framework.
 
+### 2.1 Creating a Project
+Once you have Django installed, it is very simple to create a new project. Simply type the following into your command line:
+
+``` bash
+$ django-admin.py startproject my-project
+```
+
+The project name, in this case 'my-project', can be anything that you would like. Once you have run this command, Django will create a new directory for you. To enter that directory, type:
+
+``` bash
+$ cd my-project
+```
+
+or whatever you named your project. We now have our first Django project!
+
+### 2.2 File Structure
+Here is a basic file structure for a Django project:
+
+	ProjectName/
+	├── manage.py
+	├── ProjectName/
+	│   ├── __init__.py
+	│   ├── settings.py
+	│   ├── urls.py
+	│   └── wsgi.py
+	
+By typing `ls` within your directory you should see these files.
+
+The `manage.py` in the main project directory file contains some utilities we will use later to sync our databases, to create new models, etc. You should never have to edit the file, though, so don't worry at all about it.
+
+If we move into our `my-project` sub-directory, we will see some more files:
+
+`__init__.py` is an empty file that is required for Python to treat the directory as a package. You will generally not add anything to this file.
+
+`settings.py` is one of the most important files in our entire project. It defines the configuration for our application, including information about our database, where we store our templates and other files, among many other things. 
+
+`urls.py` is the file that links our views to particular URLs for our web addresses.
+
+### 2.3 Running the Server
+Now that we understand the different parts of our Django application, we can run our application server. To do this, simply type the following:
+
+``` bash
+$ python manage.py runserver
+```
+
+Then, visit the link `127.0.0.1:8000/` in your browser, and if everything is working, you should see the "It Worked!" default page that Django provides for us.
+
 -----
+
+
+
+
+
+
+
 
 
 
