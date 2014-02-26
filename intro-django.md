@@ -830,4 +830,4 @@ The entire code for the project seen here can be retrieved [here](github-code).
 [templates]: https://docs.djangoproject.com/en/dev/topics/templates/
 [by-example]: http://lightbird.net/dbe/
 [getting-started]: http://gettingstartedwithdjango.com
-[github-code]: https://github.com/mjp2220/development-tutorials/tree/master/django-code
+[github-code]: https://github.com/mjp2220/development-tutorials/django-code
