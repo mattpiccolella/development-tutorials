@@ -807,9 +807,15 @@ Congratulations! You have now finished your first app! Albeit a simple version o
 Perhaps one of the best parts of Django is its strong online resources. Here are some additional resources that will help in your future learning:
 
 [The Django Book](djangobook)
+
 [Official Django Documentation](django)
+
 [Django by Example](by-example)
+
 [Getting Started with Django](getting-started)
+
+## Sample Project Code
+The entire code for the project seen here can be retrieved [here](github-code).
 
 
 [python-install]: http://python.org/download/releases/2.7.6/
@@ -824,4 +830,4 @@ Perhaps one of the best parts of Django is its strong online resources. Here are
 [templates]: https://docs.djangoproject.com/en/dev/topics/templates/
 [by-example]: http://lightbird.net/dbe/
 [getting-started]: http://gettingstartedwithdjango.com
-
+[github-code]: https://github.com/mjp2220/development-tutorials/tree/master/django-code
