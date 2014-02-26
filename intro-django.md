@@ -3,9 +3,9 @@
 
 *Walking you through your first application in Django*
 
-Written and developed by [Matt Piccolella](mailto:matthew@adicu.com) and [ADI](adi).
+Written and developed by [Matt Piccolella](mailto:matthew@adicu.com) and [ADI][adi].
 
-Credit to [Django Book](django-book).
+Credit to [Django Book][django-book].
 
 -------
 
@@ -14,7 +14,7 @@ Credit to [Django Book](django-book).
 Before we begin, it is valuable to first understand what Django is exactly.
 
 ### What is Django?
-[Django](django) is "a high-level Python Web framework that encourages rapid development and clean, pragmatic design." It includes awesome data modeling written entirely in Python, an automatic admin interface that allows you to manage content, customization of URLs, and a very powerful templating system. It is very similar to, yet much more robust than, Flask.
+[Django][django] is "a high-level Python Web framework that encourages rapid development and clean, pragmatic design." It includes awesome data modeling written entirely in Python, an automatic admin interface that allows you to manage content, customization of URLs, and a very powerful templating system. It is very similar to, yet much more robust than, Flask.
 
 ### What is Django used for?
 Django is used primarily by complex, database-driven websites. It is used by such popular websites as Pinterest, Instagram, and the Washington Post.
@@ -25,7 +25,7 @@ Many of you have probably heard of Ruby on Rails. Django is very similar to Ruby
 ---------
 <a id="about-this-document"></a>
 ## Using this Document
-This tutorial walks you through creating your first application in Django. It assumes that you have Python installed on your computer. If you do not have Python installed on your computer, [here](python) is where to install Python for your particular operating system.
+This tutorial walks you through creating your first application in Django. It assumes that you have Python installed on your computer. If you do not have Python installed on your computer, [here][python] is where to install Python for your particular operating system.
 
 While you don't have to be an expert programmer to understand the content in this tutorial, it is tailored to someone who knows at least one programming language, preferrably Python. The code is not complicated that is featured in this tutorial, though, so someone new will probably be able to understand it.
 
@@ -84,21 +84,21 @@ $ django-admin.py version
 1.6.2
 ```
 
-If you do not have pip, you can download the `.tar` file [here](install-django) and follow the appropriate instructions. 
+If you do not have pip, you can download the `.tar` file [here][install-django] and follow the appropriate instructions. 
 
-If Python is not installed, please first follow the instructions [here](python) before installing Django by either of the above methods.
+If Python is not installed, please first follow the instructions [here][python] before installing Django by either of the above methods.
 
 <a id="windows"></a>
 ###0.2 Windows
 
-While Django is often harder to install on Windows, it is still very simple and can be completed in just a few steps. After ensuring that Python is installed by visiting the above link, simply go to [this simple tutorial](windows-install) allows you to install Django on a windows machine in just a few minutes.
+While Django is often harder to install on Windows, it is still very simple and can be completed in just a few steps. After ensuring that Python is installed by visiting the above link, simply go to [this simple tutorial][windows-install] allows you to install Django on a windows machine in just a few minutes.
 
-It, however, requires the installation of [SVN](svn) and [Exemaker](exe). If you have any questions about installing these, both websites provide good documentation, or email [me](mailto:matthew@adicu.com) with any questions.
+It, however, requires the installation of [SVN][svn] and [Exemaker][exe]. If you have any questions about installing these, both websites provide good documentation, or email [me](mailto:matthew@adicu.com) with any questions.
 
 -----
 <a id="structure"></a>
 ## 1.0 The Structure of a Django Application
-Many of you have probably heard of the [Model-View-Controller](mvc) framework in Software Development. Basically what it means is that the model is meant to represent, or "model", the data, the view is meant to visually represent the content, and the controller is meant to link the user and the interface.
+Many of you have probably heard of the [Model-View-Controller][mvc] framework in Software Development. Basically what it means is that the model is meant to represent, or "model", the data, the view is meant to visually represent the content, and the controller is meant to link the user and the interface.
 
 Django uses its own adaptation of this framework, known as the "Model-View-Template" framework. We will explain what each one of these means here.
 
@@ -327,7 +327,7 @@ Thhere are a few things we must notice about the changes we have made. First, we
 ### 3.4 Templates
 As you can probably imagine, once we get into large applications, it would be incredibly unrealistic to type all of our HTML into a simple string and return it. For this, we use templates! 
 
-A template, in its most basic form, is an HTML page. However, they are much more than that. We can use templates to display variables, loop through information, make decisions using if's and else's, and much more. While this tutorial does not cover all of the functionality of Django templates, much more can be read about them [here](templates). 
+A template, in its most basic form, is an HTML page. However, they are much more than that. We can use templates to display variables, loop through information, make decisions using if's and else's, and much more. While this tutorial does not cover all of the functionality of Django templates, much more can be read about them [here][templates]. 
 
 Let's write an incredibly simple template for a page that will display a random number from 1 to 6, simulating a dice roll. Before we start, make sure you are in your base project directory (i.e. the one that contains `manage.py`). Create a new directory called `templates`, so your new file structure looks as follows:
 
@@ -830,4 +830,4 @@ The entire code for the project seen here can be retrieved [here][github-code].
 [templates]: https://docs.djangoproject.com/en/dev/topics/templates/
 [by-example]: http://lightbird.net/dbe/
 [getting-started]: http://gettingstartedwithdjango.com
-[github-code]: https://github.com/mjp2220/development-tutorials/django-code
+[github-code]: https://github.com/mjp2220/development-tutorials/tree/master/django-code
