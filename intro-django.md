@@ -59,7 +59,7 @@ While you don't have to be an expert programmer to understand the content in thi
 -	[5.0 Putting it all Together: Forms](#forms)
 	- [5.1 Normal HTML Forms](#html)
 	- [5.2 Writing Django Forms](#django_forms)
-	- [5.3 Posting](#user)
+	- [5.3 Writing our Template](#user_template)
 	- [5.4 Our App](#our app)
 	
 	
@@ -433,7 +433,7 @@ We see that Django comes with some default comments that help us to understand w
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.                                                    
-        'NAME': '/Users/Ruth/Desktop/django-tutorial/myproject/database.db',                      # Or path to database file if using sqlite3.                                                                    
+        'NAME': '/Users/Matt/Desktop/django-tutorial/myproject/database.db',                      # Or path to database file if using sqlite3.                                                                    
         # The following settings are not used with sqlite3:                                                                                              
         'USER': '',
         'PASSWORD': '',
@@ -641,8 +641,175 @@ First, we import the modules that we need. Then, we create new Admin objects for
 ------
 <a id="forms"></a>
 ## 5.0 Forms
+One of the most important parts of web development is being able to get input from our users. Django provides a simple way for dealing with forms in a way that avoids writing the same code over and over again.
 
+<a id="html"></a>
+### 5.1 Normal HTML Forms
+In normal HTML, this is normally a pretty tedious task that consists of writing things like this over and over again:
 
+``` html
+<html>
+    <head>
+        <title>Search</title>
+    </head>
+    <body>
+        <form action="/search/" method="get">
+            <input type="text" name="q">
+            <input type="submit" value="Search">
+        </form>
+    </body>
+</html>
+```
+
+In Django, we can get these results in a view. Say we have the URL `/search/`, that we call on submit, hooked up to a view function called `search`:
+
+``` python
+def search(request):
+    if 'q' in request.GET:
+        message = "You searched for: %r" % request.GET['q']
+    else:
+        message = "You submitted an empty form."
+    return HttpResponse(message)
+```
+As you can see from this, `request.GET` is a dictionary that contains all of the information that is passed to us by 'GET' methods from within the HTML. If we have that, then we know the user submitted the form. If they didn't, then we know the form was an empty form.
+
+While this can be used to write basic forms, it is still very inefficient. There will be all sorts of error handling we will have to account for; for example, say there is a user registration form that has many fields. We want to be able to give particular error messages without having to customize this every time. For this, we can use Django Form classes.
+
+<a id="django_forms"></a>
+### 5.2 Writing Django Forms
+Inside of Django, there is a module called `django.forms` that allows for the functionality that we have been looking for: simple, easy-to-customize forms with automatic error handling and validation.
+
+To begin writing our first Django form, create a file in our project sub-directory (the same folder with `settings.py` in it) called `forms.py`. Inside of it, type the following code:
+
+``` python
+from django import forms
+
+class TweetForm(forms.Form):
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=40)
+    tweet = forms.CharField(max_length=140)
+```
+
+Once we have created this form, we can use it inside of our `views.py` folder to take care of the handling of tweets. Open up the `views.py` file and create a new function called `post_tweet` and add the code as follows:
+
+``` python
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+import random
+from forms import TweetForm
+from models import Author, Tweet
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def post_tweet(request):
+    c = {}
+    if request.method == 'POST':
+        form = TweetForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            first_name = cd['first_name']
+            last_name = cd['last_name']
+            tweet = cd['tweet']
+            current_authors = Author.objects.filter(first_name=first_name).filter(last_name=last_name)
+            if (len(current_authors) == 1):
+                author = current_authors[0]
+            else:
+                author = Author.create(first_name=first_name, last_name=last_name)
+                author.save()
+            tweet = Tweet.create(tweet=tweet,author=author)
+            tweet.save()
+            form = TweetForm()
+    else:
+        form = TweetForm()
+    c['form'] = form
+    tweets = Tweet.objects.all()
+    c['tweets'] = tweets
+    return render_to_response('tweets.html', c)
+``` 
+This is our longest and most complicated piece of code yet, so we will go through it piece by piece. First, we import the form and our two models from their respective folders. One thing to notice is our last import: csrf. CSRF stands for cross-site registry forgery. It basically means that people can forge their registry on your site, making it a security risk. Django normally requires measures to be taken to protect against this, which ensures the safety of a site. To get around this in our simple example, we simply use the csrf_exempt decorator for our function, which we import. 
+
+Inside of our method, we first create a dictionary, in which we can store data that is to be returned to the template. First, we check if any data has been posted to our method. If it has been, we know we will have some processing to do. If it hasn't, we instead create a blank TweetForm that will be passed to our page. 
+
+Once we know that data has been posted, we immediately store that form into a variable, which we do using the `request.POST` dictionary. We check if the form is valid first, meaning it passes all of the validations that we established in our `forms.py` file. If it has been, we create a dictionary to hold all the data that we got from the form, only cleaned. This prevents any malicious information that could've been passed to our form from hurting our website.
+
+Next, we take the first_name, the last_name, and the tweet objects from the form. Next, we search for `current_authors`. This means, using the data access tools we saw before, we check for all the Author objects currently defined in our database, filtering those only that have the same first_name and the same_last name as the ones we received from the form. The `current_authors` object is a list of objects from the database that matched our query. If there is an author object that currently exists in the database, meaning we saw a result from our query, we store that as author. Otherwise, if we need to create an object for a new Author, we do that using the `create` method we wrote earlier. We then set that equal to `author` and save it to the database. Once outside of that, we create a new tweet given the tweet itself and the author object, saving that to the database. If we have correctly processed all the information from our form, we can create a new blank one and pass it.
+
+Finally, once we have our form set, either as the invalid form that was passed or a new, blank one, we can then pass it back to the page by setting it to `form` in our dictionary. But first, we want to load all the tweets that are available currently, so we can display those on our page. Once we have passed these tweets, we can then render our template, called 'tweets.html'. 
+
+This may be hard to understand at first, but as you work more and more in Django, you will see the incredible value of these forms.
+
+<a id="user_template"></a>
+### 5.3 Writing our Template
+As you may have guessed, we still have to write our `tweets.html` template. Let's write that write now:
+
+``` html
+<html>
+    <head>
+        <title>Tweets</title>
+    </head>
+    <body>
+        <h1>Send us a Tweet!</h1>
+        {% if form.errors %}
+            <p style="color: red;">Please error the error(s) below</p>
+        {% endif %}
+
+        <form action="/tweets/" method="post">
+            <table>
+                {{ form.as_table }}
+            </table>
+            <input type="submit" value="Submit">
+        </form>
+
+        {% for tweet in tweets %}
+            <h2>Tweet from {{tweet.author.first_name}} {{tweet.author.last_name}}</h2>
+            <h3>{{tweet.tweet}}</h3>
+        {% endfor %}
+    </body>
+</html> 
+```
+
+The template is pretty simple. First, we display any errors that are accompanied by our form in the top part, coloring them red. We then create our form, giving it the `/tweets/` action, a URL we will specify inside of our URLs file momentarily. We display the form as a table by calling {{ form.as_table }}. 
+
+We then create a submit input. Then, we cycle through all of our tweets using a simple for loop. We display the name of the author, which can be accessed through the tweet's author attribute. Then we display the content of the tweet. It is quite simple to do! We do not need to worry about specifying the different input types from the form or anything like that; Django does it for us!
+
+### 5.4 Our App
+The last thing we need to do is a simple URL connection. We open up our `urls.py` file and add one more URL, to connect our `/tweets/` function to the `post_tweet` view that we wrote:
+
+``` python
+from django.conf.urls import patterns, include, url
+
+# Uncomment the next two lines to enable the admin:                                                                                                      
+from django.contrib import admin
+admin.autodiscover()
+
+urlpatterns = patterns('',
+    # Examples:                                                                                                                                          
+    # url(r'^$', 'myproject.views.home', name='home'),                                                                                                   
+    # url(r'^myproject/', include('myproject.foo.urls')),                                                                                                
+
+    # Uncomment the admin/doc line below to enable admin documentation:                                                                                  
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:                                                                                                       
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^$', 'myproject.views.home', name='home'),
+    url(r'^tweets/', 'myproject.views.post_tweet', name='post_tweet'),
+)
+```
+
+Once this is complete, we can view our app! If we enter a name and a tweet and hit submit, we see it instantly appear on our "news feed" underneath the search box. Try leaving out one of the fields; Django automatically throws the error we need to! 
+
+Congratulations! You have now finished your first app! Albeit a simple version of Twitter, this tutorial has shown you the power of Django and will hopefully inspire you to continue to learn.
+
+-----
+
+## Additional Resources
+Perhaps one of the best parts of Django is its strong online resources. Here are some additional resources that will help in your future learning:
+
+[The Django Book](djangobook)
+[Official Django Documentation](django)
+[Django by Example](by-example)
+[Getting Started with Django](getting-started)
 
 
 [python-install]: http://python.org/download/releases/2.7.6/
@@ -655,3 +822,6 @@ First, we import the modules that we need. Then, we create new Admin objects for
 [mvc]: http://www.codinghorror.com/blog/2008/05/understanding-model-view-controller.html
 [regex]: http://www.webforefront.com/django/regexpdjangourls.html
 [templates]: https://docs.djangoproject.com/en/dev/topics/templates/
+[by-example]: http://lightbird.net/dbe/
+[getting-started]: http://gettingstartedwithdjango.com
+
