@@ -56,11 +56,11 @@ While you don't have to be an expert programmer to understand the content in thi
 	- [4.3 Basic Data Access](#access)
 	- [4.4 Enabling Admin](#enable)
 	- [4.5 Registering our Models](#registering)
--	[5.0 Forms and Users](#forms)
+-	[5.0 Putting it all Together: Forms](#forms)
 	- [5.1 Normal HTML Forms](#html)
-	- [5.2 Writing Django Forms](#django)
-	- [5.3 User Registration](#user)
-	- [5.4 Sessions](#sessions)
+	- [5.2 Writing Django Forms](#django_forms)
+	- [5.3 Posting](#user)
+	- [5.4 Our App](#our app)
 	
 	
 ----------
@@ -395,7 +395,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'home/django/myproject/templates',
+    '/home/django/myproject/templates',
 )
 ```
 
@@ -406,6 +406,241 @@ Now that we have added this to our file, save your changes to both your `home.ht
 There are many other ways to render templates in Django; we simply chose `render_to_response` because it is simple and easy to explain. You can go to the official documentation on [templates](templates) to learn some alternative ways render templates.
 
 -----
+<a id="models"></a>
+## 4.0 Models
+Now that we know how to process data and pass it to our templates, let's work on making some data and storing that data so we can use it for later. For this, we use models.
+<a id="database"></a>
+### 4.1 Configuring the Database
+Before we can create out model and start creating our application, we need to first configure our database to store the information we want it to. To do this, open up your `settings.py` file and edit the portion called `DATABASES`:
+
+``` python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.                                                    
+        'NAME': '',                      # Or path to database file if using sqlite3.                                                                    
+        # The following settings are not used with sqlite3:                                                                                              
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.                          
+        'PORT': '',                      # Set to empty string for default.                                                                              
+    }
+}
+```
+
+We see that Django comes with some default comments that help us to understand what we need to do to configure our database. For this simple application, we will use sqlite3, which is a SQL database that is stored locally in a file, rather than on its own server like MySQL. To configure, we simply add 'sqlite3' to the end of our `ENGINE` line and add the path on your computer to the location we want to store the database (normally in our project directory). We can call our file something like 'database.db'. Our finalized configuration should look something like this:
+
+``` python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.                                                    
+        'NAME': '/Users/Ruth/Desktop/django-tutorial/myproject/database.db',                      # Or path to database file if using sqlite3.                                                                    
+        # The following settings are not used with sqlite3:                                                                                              
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.                          
+        'PORT': '',                      # Set to empty string for default.                                                                              
+    }
+}
+```
+<a id="app"></a>
+### 4.2 Creating our First App
+Now that our database settings are configured, let's start our application. To do this, type the following into your Terminal in the home directory of your project:
+
+``` bash
+$ python manage.py startapp sampletwitter
+```
+
+If we look at our project directory, we will see that we have a new directory called 'sampletwitter' with the following structure:
+
+	sampletwitter/
+	├── __init__.py
+	├── models.py
+	├── tests.py
+	├── views.py
+	
+We have explained what each of these files does already, except for `tests.py`, which is self-explanatory. In this tutorial, we will be only worrying about models.py; we can write our views in our previous `views.py` file and we won't need to worry about testing. Open your `models.py` file and you should see something like this:
+
+``` python
+from django.db import models
+
+# Create your models here. 
+```
+
+To start, let's add a model for an author. We are going to have authors for our tweets, so we should probably store those. Here, we create a model for 'author':
+
+``` python
+from django.db import models
+
+class Author(models.Model):
+	first_name = models.CharField(max_length=30)
+	last_name = models.CharField(max_length=40)
+```
+
+This is about as simple a model as we will see; an author simply stores two strings, one for the first name and one for the last name. Now, let's add a model to represent a 'tweet:':
+
+``` python
+from django.db import models
+
+class Author(models.Model):
+	first_name = models.CharField(max_length=30)
+	last_name = models.CharField(max_length=40)
+
+class Tweet(models.Model):
+	tweet = models.CharField(max_length=140)
+	author = models.ForeignKey(Author)
+```
+
+In this, we see it is very similar to the Author model, except for the inclusion of something called a foreign key. A foreign key is essentially a way to link a Tweet to an Author, in that a Tweet HAS-AN Author.
+
+Before we finish, we need to come up with a way to create new objects. For this, we use a class method called 'create':
+
+``` python
+from django.db import models
+
+class Author(models.Model):
+	first_name = models.CharField(max_length=30)
+	last_name = models.CharField(max_length=40)
+	@classmethod
+	def create(cls, first_name, last_name):
+		author = cls(first_name=first_name,last_name=last_name)
+		return author
+
+class Tweet(models.Model):
+	tweet = models.CharField(max_length=140)
+	author = models.ForeignKey(Author)
+	@classmethod
+	def create(cls, tweet, author):
+		tweet = cls(tweet=tweet, author=author)
+		return tweet
+```
+
+This completes our `models.py` file. Now, before we sync our database to contain our new models, we just have to add our 'sampletwitter' app to the `INSTALLED_APPS` tuple in our `settings.py`:
+
+``` python
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Uncomment the next line to enable the admin:                                                                                                       
+    # 'django.contrib.admin',                                                                                                                            
+    # Uncomment the next line to enable admin documentation:                                                                                             
+    # 'django.contrib.admindocs', 
+    'sampletwitter',                                                                                                                       
+)
+```
+
+Once this file is saved, go into your Terminal and type the following command in your project directory:
+
+``` bash
+$ python manage.py syncdb
+```
+
+You will see Django will create lots of different tables for you. It will also ask you to create a user for the database. This is important! Doing this now will allow us to access our admin interface later.
+
+<a id="access"></a>
+### 4.3 Basic Data Access
+To show a basic demonstration of how we will access this data, let's open up our Django shell by typing the following:
+
+``` bash
+$ python manage.py shell
+```
+
+Once you type this, you should see several carots appear. Let's now create our first model:
+
+``` bash
+>>> from sampletwitter.models import Author, Tweet
+>>> a1 = Author.create("Matt", "Piccolella")
+>>> a1.save()
+>>> authors = Author.objects.all()
+>>> authors
+[<Author: Author object>]
+```
+
+First, we import the modules we need for our models. Then, we create our first author object, giving it a first and a last name. Then, we save it to the database using our `save()` function. Then, we query the database for all its authors by using the call to `Author.objects.all()`. We then print that object, which shows us a single author object, the one that we just created. This same thing can be 
+
+<a id="enable"></a>
+### 4.4 Enabling Admin
+While we can see these objects from the Django shell, it would make more sense if we could see this pieces of information in a better interface. This is exactly what the Django admin interface is for! By taking a few simple steps, we can ensure that we can see all the information that we need to. 
+
+First, go back to your `settings.py` file to our list of installed apps. Uncomment the two lines where instructured so our line looks as follows:
+
+``` python
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Uncomment the next line to enable the admin:                                                                                                       
+    'django.contrib.admin',                                                                                                                            
+    # Uncomment the next line to enable admin documentation:                                                                                             
+    'django.contrib.admindocs', 
+    'sampletwitter',                                                                                                                       
+)
+```
+
+Next, go to our `urls.py` file and uncomment the two lines at the top as well as the two lines at the bottom, as instructed, so our new file looks like this:
+
+``` python 
+from django.conf.urls import patterns, include, url
+
+# Uncomment the next two lines to enable the admin:                                                                                                      
+from django.contrib import admin
+admin.autodiscover()
+
+urlpatterns = patterns('',
+    # Examples:                                                                                                                                          
+    # url(r'^$', 'myproject.views.home', name='home'),                                                                                                   
+    # url(r'^myproject/', include('myproject.foo.urls')),                                                                                                
+
+    # Uncomment the admin/doc line below to enable admin documentation:                                                                                  
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:                                                                                                       
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^$', 'myproject.views.home', name='home'),
+)
+```
+
+Once we make these changes, run our server again by typing from the project directory:
+
+``` bash
+$ python manage.py runserver
+```
+
+Now, visit `http://127.0.0.1:8000/admin`, and log in with the username you created earlier. Pretty awesome, right? From within here, we can view already created objects, we can create new objects, or even delete old objects. 
+
+However, there's just one problem: we can't see our Author and Tweet object tables. For this, we need to make one correction.
+
+<a id="registering"></a>
+### 4.5 Registering our Models
+To see our models on our Admin site, we simply have to register our models. We do this by creating a file called `admin.py` inside of our `sampletwitter` application. In this file, we type the following:
+
+``` python
+from django.contrib import admin
+from models import Author, Tweet
+
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name')
+    search_fields = ('first_name', 'last_name')
+
+class TweetAdmin(admin.ModelAdmin):
+    list_display = ('tweet', 'author')
+    search_fields = ('tweet',)
+
+admin.site.register(Author, AuthorAdmin)
+admin.site.register(Tweet, TweetAdmin)
+```
+
+First, we import the modules that we need. Then, we create new Admin objects for each of our two models. We do not need to do this, but it adds some functionality to our admin site, including the ability to be able to search our tables. Once we save this and run our server again, we will be able to see our app models registered in the site. Click on "Author" and you will see the Author object we created earlier.
+
+------
+<a id="forms"></a>
+## 5.0 Forms
 
 
 
