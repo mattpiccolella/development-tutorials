@@ -5,7 +5,7 @@
 
 Written and developed by [Matt Piccolella](mailto:matthew@adicu.com) and [ADI][adi].
 
-Credit to [Django Book][django-book].
+Credit to [Django Book][djangobook].
 
 -------
 
